@@ -17,8 +17,6 @@ public class LoginActivity extends AppCompatActivity {
 
     private AutoCompleteTextView mUserView;
     private EditText mPasswordView;
-    private View mProgressView;
-    private View mLoginFormView;
     private SharedPreferencesConfig sessionManager;
 
     @Override
@@ -26,7 +24,6 @@ public class LoginActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
-        // Set up the login form.
         mUserView = findViewById(R.id.user);
         mPasswordView = findViewById(R.id.password);
         mPasswordView.setOnEditorActionListener(new TextView.OnEditorActionListener() {
@@ -48,39 +45,25 @@ public class LoginActivity extends AppCompatActivity {
             }
         });
 
-        mLoginFormView = findViewById(R.id.login_form);
-        mProgressView = findViewById(R.id.login_progress);
-
         sessionManager = new SharedPreferencesConfig(this);
     }
 
-
-    /**
-     * Attempts to sign in or register the account specified by the login form.
-     * If there are form errors (invalid email, missing fields, etc.), the
-     * errors are presented and no actual login attempt is made.
-     */
     private void attemptLogin() {
-
-        // Reset errors.
         mUserView.setError(null);
         mPasswordView.setError(null);
 
-        // Store values at the time of the login attempt.
         String user = mUserView.getText().toString();
         String password = mPasswordView.getText().toString();
 
         boolean cancel = false;
         View focusView = null;
 
-        // Check for a valid password, if the user entered one.
         if (!TextUtils.isEmpty(password) && !isPasswordValid(password)) {
             mPasswordView.setError("Senha muito curta");
             focusView = mPasswordView;
             cancel = true;
         }
 
-        // Check for a valid email address.
         if (TextUtils.isEmpty(user)) {
             mUserView.setError("Campo obrigatório");
             focusView = mUserView;
@@ -88,7 +71,6 @@ public class LoginActivity extends AppCompatActivity {
         }
 
         if (cancel) {
-            // There was an error; don't attempt login and focus the first form field with an error.
             focusView.requestFocus();
         } else {
             sessionManager.setLoginData(user, true);
