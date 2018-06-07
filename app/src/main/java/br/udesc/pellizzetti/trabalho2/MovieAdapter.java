@@ -1,17 +1,20 @@
 package br.udesc.pellizzetti.trabalho2;
 
 import android.content.Context;
+import android.content.Intent;
+import android.graphics.Bitmap;
 import android.support.constraint.ConstraintLayout;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
 
+import java.io.ByteArrayOutputStream;
+import java.io.FileOutputStream;
 import java.util.List;
 
 public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieViewHolder> {
@@ -28,11 +31,9 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieViewHol
     }
 
     @Override
-    public MovieAdapter.MovieViewHolder onCreateViewHolder(ViewGroup parent,
-                                                           int viewType) {
+    public MovieAdapter.MovieViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext()).inflate(rowLayout, parent, false);
         return new MovieViewHolder(view);
-
     }
 
     @Override
@@ -54,7 +55,7 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieViewHol
         return movies.size();
     }
 
-    public static class MovieViewHolder extends RecyclerView.ViewHolder {
+    protected class MovieViewHolder extends RecyclerView.ViewHolder {
         ConstraintLayout moviesLayout;
         TextView movieTitle;
         TextView data;
@@ -64,12 +65,37 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieViewHol
 
         public MovieViewHolder(View v) {
             super(v);
+
             moviesLayout = v.findViewById(R.id.movies_layout);
             movieImage = v.findViewById(R.id.movie_image);
             movieTitle = v.findViewById(R.id.title);
             data = v.findViewById(R.id.date);
             movieDescription = v.findViewById(R.id.description);
             rating = v.findViewById(R.id.rating);
+
+            v.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View iV) {
+                    Context context = iV.getContext();
+
+                    // Cache
+                    movieImage.buildDrawingCache();
+                    Bitmap bmp = movieImage.getDrawingCache();
+                    ByteArrayOutputStream stream = new ByteArrayOutputStream();
+                    bmp.compress(Bitmap.CompressFormat.PNG, 100, stream);
+                    byte[] byteArray = stream.toByteArray();
+
+                    Intent i = new Intent(context, MovieDetailActivity.class);
+
+                    i.putExtra("movieImage", byteArray);
+                    i.putExtra("movieTitle", movieTitle.getText());
+                    i.putExtra("movieDescription", movieDescription.getText());
+                    i.putExtra("data", data.getText());
+                    i.putExtra("rating", rating.getText());
+
+                    context.startActivity(i);
+                }
+            });
         }
     }
 }
